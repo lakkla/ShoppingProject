@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zxsc.mapper.CartMapper">
+    
+    <resultMap id="CartMap" type="com.zxsc.entity.Cart">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="productName" column="product_name"/>
+        <result property="price" column="price"/>
+        <result property="image" column="image"/>
+        <result property="stock" column="stock"/>
+    </resultMap>
+    
+    <select id="findByUserId" resultMap="CartMap">
+        SELECT c.*, p.name AS product_name, p.price, p.image, p.stock 
+        FROM cart c LEFT JOIN product p ON c.product_id = p.id 
+        WHERE c.user_id = #{userId} ORDER BY c.create_time DESC
+    </select>
+    
+    <select id="findByUserAndProduct" resultMap="CartMap">
+        SELECT * FROM cart WHERE user_id = #{userId} AND product_id = #{productId}
+    </select>
+    
+    <insert id="insert" parameterType="com.zxsc.entity.Cart" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO cart (user_id, product_id, quantity) VALUES (#{userId}, #{productId}, #{quantity})
+    </insert>
+    
+    <update id="update" parameterType="com.zxsc.entity.Cart">
+        UPDATE cart SET quantity = #{quantity} WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM cart WHERE id = #{id}
+    </delete>
+    
+    <delete id="deleteByUserId">
+        DELETE FROM cart WHERE user_id = #{userId}
+    </delete>
+    
+    <delete id="deleteByIds">
+        DELETE FROM cart WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
